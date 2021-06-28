@@ -1,4 +1,4 @@
-# Projetos iniciantes feitos em C
+# Programas feitos em C
 
 
 --> PASTAS
