@@ -1,1 +1,1 @@
-Diretório de atividades da disciplina de Programação com Arquivos.
+Diretório de atividades e trabalhos da disciplina de Programação com Arquivos.
