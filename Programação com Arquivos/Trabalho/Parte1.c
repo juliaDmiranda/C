@@ -2,7 +2,6 @@
 #include<stdlib.h>
 #include<string.h>
 
-//Dúvida: Pode utilizar typedef na estrutura ou da forma que o senhor apresentou no documento do trabalho?
 typedef struct Palavra
 {
     char letras[50]; //caracteres que formam a palavra 
@@ -15,9 +14,6 @@ typedef struct Palavra
 t_palavra* InicializaLista();
 
 // Função para inserir palavra em ordem alfabética na lista
-// Dúvida:
-// 1 - Considera-se que só será escrita letra minúscula ou maiúsculas também?
-// 2 -  
 t_palavra* InsereLista(t_palavra* lista,char* palavra, int linha);
 
 // Função para verificar se determinada palavra já foi posta na lista
@@ -65,7 +61,7 @@ t_palavra* InsereLista(t_palavra* lista,char* palavra, int linha){
 }
 
 void CriaIndice(){
-    int qntDePalavras = 0, linha = 1; // Dúvida: A contagem da linha começa no 0?
+    int qntDePalavras = 0, linha = 1;
     char nomeDoArquivo[20], palavra[50];
     FILE* arq;
 
@@ -83,7 +79,6 @@ void CriaIndice(){
         
         while(fread(palavra, sizeof(char), 1, arq))
         {
-            //Dúvida no reconhecimento da quebra de linha "\n"
 /*             if(!strcmp(palavra, "\n") || strcspn(palavra, "\n") == strlen(palavra) ) // Se for quebra 
                 linha++; */
             //else{
@@ -126,7 +121,6 @@ void CriaIndice(){
     //Fecha arquivo
 }
 
-// Dúvida: Caso se escolha a consulta deve-se liberar a memória alocada para a lista, mas caso essa opção não seja escolhida nunca?
 void BuscaDePalavras()
 {
     // Liberar memória de lista
