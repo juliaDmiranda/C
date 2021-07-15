@@ -13,11 +13,11 @@ typedef struct Palavra
 typedef struct Lista{
     t_palavra info;
     struct Lista *prox;
-}t_lista;
+}Lista;
 
-void MostrarLista(t_lista *lista)
+void MostrarLista(Lista *lista)
 {
-    t_lista *aux = lista;
+    Lista *aux = lista;
 
     while (aux != NULL)
     {
@@ -35,38 +35,38 @@ void MostrarLista(t_lista *lista)
 }
 
 // Função para liberar memória alocada para a lista
-t_lista* DesalocaLista(t_lista* lista);
+Lista* DesalocaLista(Lista* lista);
 
 // Função para inicializar a lista
-t_lista *InicializaLista();
+Lista *InicializaLista();
 
 // Função para passar para letras minúsculas palavras que possuam letras maiúsculas
 void TransformaLetraMaiusculaEmMinuscula(char* palavra);
 
 // Função para inserir palavra em ordem alfabética na lista
-t_lista *InsereLista(t_lista *lista, char *palavra, int linha);
+Lista *InsereLista(Lista *lista, char *palavra, int linha);
 
 // Função para inserir informações do índice em uma lista
-t_lista * InsereListaNoFinal(t_lista*lista, t_palavra informacao);
+Lista * InsereListaNoFinal(Lista*lista, t_palavra informacao);
 
 // Função para verificar se determinada palavra já foi posta na lista
 // Retorna: Ponteiro da palavra - palavra já existe, NULL - palavra não existe
-t_lista *Existe(t_lista *lista, char *palavra);
+Lista *Existe(Lista *lista, char *palavra);
 
 // Função para criar índice em arquivo binário "índice.h"
-void CriaIndice(t_lista* lista, int qtdPalavras);
+void CriaIndice(Lista* lista, int qtdPalavras);
 
 //  Função para guardas as informações das palavras de um arquivo texto no registro Palavras, bem como a quantidade de palavras do arquivo
-t_lista* LeArqTextoParaLista(t_lista* lista, int* qtdPalavras);
+Lista* LeArqTextoParaLista(Lista* lista, int* qtdPalavras);
 
 //  Função para mostrar informações sobre a palavra buscada pelo usuário
 void MostraPalavra(t_palavra info);
 
 //  Função para busca de palavras através do índice já existente
-void BuscaDePalavras(t_lista* Lista);
+void BuscaDePalavras(Lista* Lista);
 
 //  Função para ler as informações do índice do arquivo "índice.dat" armazenando um uma lista
-t_lista* LeArqBinParaLista(t_lista* lista);
+Lista* LeArqBinParaLista(Lista* lista);
 
 //  Função de menu de opções do usuário
 void Menu();
@@ -77,14 +77,14 @@ int main()
     return 0;
 }
 
-t_lista *InicializaLista()
+Lista *InicializaLista()
 {
     return NULL;
 }
 
-t_lista* DesalocaLista(t_lista* lista){
-    t_lista* aux = lista;
-    t_lista* ant;
+Lista* DesalocaLista(Lista* lista){
+    Lista* aux = lista;
+    Lista* ant;
 
     while(aux != NULL){
         ant = aux;
@@ -106,9 +106,9 @@ void TransformaLetraMaiusculaEmMinuscula(char *palavra){
             palavra[i] = tolower(palavra[i]);
 }
 
-t_lista *Existe(t_lista *lista, char *palavra)
+Lista *Existe(Lista *lista, char *palavra)
 {
-    t_lista *aux = lista;
+    Lista *aux = lista;
 
     TransformaLetraMaiusculaEmMinuscula(palavra); // Dar um jeito 1- verifica 2- n verifica (quando for só busca) mexer depois
 
@@ -125,9 +125,9 @@ t_lista *Existe(t_lista *lista, char *palavra)
 }
 
 //Falta inserir em ordem alfabética
-t_lista *InsereLista(t_lista *lista, char *palavra, int linha)
+Lista *InsereLista(Lista *lista, char *palavra, int linha)
 {
-    t_lista *nova_palavra = (t_lista *)malloc(sizeof(t_lista));
+    Lista *nova_palavra = (Lista *)malloc(sizeof(Lista));
 
     nova_palavra->info.qtdOcorrencias = 1;
 
@@ -137,15 +137,15 @@ t_lista *InsereLista(t_lista *lista, char *palavra, int linha)
 
     nova_palavra->info.linhas[0] = linha;
 
-    t_lista *aux = lista;
+    Lista *aux = lista;
     nova_palavra->prox = lista;
 
     return nova_palavra;
 }
 
-t_lista * InsereListaNoFinal(t_lista* lista, t_palavra informacao){
+Lista * InsereListaNoFinal(Lista* lista, t_palavra informacao){
 
-    t_lista* novaPalavra = (t_lista*)malloc(sizeof(t_lista));
+    Lista* novaPalavra = (Lista*)malloc(sizeof(Lista));
 
     strcpy(novaPalavra->info.letras, informacao.letras);
 
@@ -159,8 +159,8 @@ t_lista * InsereListaNoFinal(t_lista* lista, t_palavra informacao){
     novaPalavra->prox = NULL;
 
     if(lista != NULL){
-        t_lista* aux = lista;
-        t_lista* ant;
+        Lista* aux = lista;
+        Lista* ant;
 
         while(aux != NULL){
             ant = aux;
@@ -174,10 +174,10 @@ t_lista * InsereListaNoFinal(t_lista* lista, t_palavra informacao){
     return novaPalavra;
 }
 
-void CriaIndice(t_lista* lista, int qtdPalavras){
+void CriaIndice(Lista* lista, int qtdPalavras){
     FILE* arq = fopen("índice.dat", "w+b");                                     // Criar e abrir arquivo binário "índice.dat"
     
-    t_lista* aux = lista;
+    Lista* aux = lista;
     
     int tamDaPalavra, qtdOcorrencias;
 
@@ -200,7 +200,7 @@ void CriaIndice(t_lista* lista, int qtdPalavras){
     }
 }
 
-t_lista* LeArqTextoParaLista(t_lista* lista, int* qtdPalavras){
+Lista* LeArqTextoParaLista(Lista* lista, int* qtdPalavras){
     char nomeDoArquivo[20] = "texto";
     char palavras[200];
     int linha = 0;
@@ -226,7 +226,7 @@ t_lista* LeArqTextoParaLista(t_lista* lista, int* qtdPalavras){
             
             while (palavra != NULL)                                                                 // Análise de cada palavra do arquivo da linha atual
             {
-                t_lista *aux_palavra = Existe(lista, palavra);                                    //Checar se palavra já existe na lista
+                Lista *aux_palavra = Existe(lista, palavra);                                    //Checar se palavra já existe na lista
                 
                 if (!aux_palavra) // Se não
                 {
@@ -268,7 +268,7 @@ void MostraPalavra(t_palavra info){
     system("cls");
 }
 
-t_lista* LeArqBinParaLista(t_lista* lista){
+Lista* LeArqBinParaLista(Lista* lista){
     FILE* arq = fopen("índice.dat", "rb");
 
     // Inserir os valores em uma nova lista
@@ -305,8 +305,8 @@ t_lista* LeArqBinParaLista(t_lista* lista){
     return lista;
 }
 
-void BuscaDePalavras(t_lista* lista){
-    t_lista* info;
+void BuscaDePalavras(Lista* lista){
+    Lista* info;
 
     if(lista != NULL){
         char palavra[50];
@@ -328,7 +328,7 @@ void BuscaDePalavras(t_lista* lista){
 }
 
 void Menu(){
-    t_lista* lista = InicializaLista();
+    Lista* lista = InicializaLista();
     int opc, qtdPalavras = 0;
 
     while(1)
