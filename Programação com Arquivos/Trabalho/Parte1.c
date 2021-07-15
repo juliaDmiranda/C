@@ -175,7 +175,7 @@ Lista * InsereListaNoFinal(Lista* lista, t_palavra informacao){
 }
 
 void CriaIndice(Lista* lista, int qtdPalavras){
-    FILE* arq = fopen("indice.dat", "w+b");                                     // Criar e abrir arquivo binário "indice.dat"
+    FILE* arq = fopen("indice.dat", "wb");                                     // Criar e abrir arquivo binário "indice.dat"
 
     Lista* aux = lista;
 
@@ -199,6 +199,8 @@ void CriaIndice(Lista* lista, int qtdPalavras){
 
         aux = aux->prox;
     }
+
+    fclose(arq);
 }
 
 Lista* LeArqTextoParaLista(Lista* lista, int* qtdPalavras){
@@ -219,9 +221,7 @@ Lista* LeArqTextoParaLista(Lista* lista, int* qtdPalavras){
         int tam;
         char *palavra;
         while (fscanf(arq, " %[^\n]s ", palavras) != EOF)
-        {
-                                                                  // Leitura de cada linha do arquivo
-
+        {                                                      // Leitura de cada linha do arquivo
             linha++;                                                                                // marcação para linha
 
             palavra = strtok(palavras, " ");
@@ -232,7 +232,7 @@ Lista* LeArqTextoParaLista(Lista* lista, int* qtdPalavras){
 
                 if (!aux_palavra) // Se não
                 {
-                    *qtdPalavras = *qtdPalavras + 1;
+                    *(qtdPalavras) = *(qtdPalavras) + 1;
 
                     lista = InsereLista(lista, palavra, linha);                                     // Insere em ordem alfabética na lista
                 }
@@ -261,45 +261,42 @@ Lista* LeArqTextoParaLista(Lista* lista, int* qtdPalavras){
 }
 
 void MostraPalavra(t_palavra info){
-    info.letras[0] = toupper(info.letras[0]);
     printf("Quantidade de Ocorrencias: %d\nAparicoes(por linha):", info.qtdOcorrencias);
 
     for (int i = 0; i < info.qtdOcorrencias; i++)
         printf("\t%d", info.linhas[i]);
 
     printf("\n");
+
     system("pause");
 
-    // system("cls");
+    system("cls");
 }
 
 void printfLeArqBinParaLista(t_palavra informacao, int qtdCaracteres){
-    printf("\nEntrei no printfLeArqBinParaLista\n");
-
     printf("%d\t", qtdCaracteres);
     printf("%s\t", informacao.letras);
-    printf("%s\t", informacao.letras);
     printf("%d\t", informacao.qtdOcorrencias);
+
     for (int i = 0; i < informacao.qtdOcorrencias; i++)
-        printf("%d\t", informacao.linhas[i]);
+        printf("[qtd%d][%d]%d\t", sizeof(informacao.linhas), i, informacao.linhas[i]);
     
     printf("\n\n");
 }
 
 Lista* LeArqBinParaLista(Lista* lista){
     FILE* arq = fopen("indice.dat", "rb");
+    int qtdPalavras = 0 , qtdCaracteres;
+    t_palavra informacao;
 
     // Inserir os valores em uma nova lista
     if(arq != NULL)
     {
-        int qtdPalavras, qtdCaracteres;
-        t_palavra informacao;
-
         fread(&qtdPalavras, sizeof(int), 1, arq);
 
         printf("%d\n", qtdPalavras);
 
-        while(!feof(arq)){
+        while(feof(arq) == 0){
             fread(&qtdCaracteres, sizeof(int), 1, arq);                                     // Quantidade de caracteres
 
             fread(informacao.letras, sizeof(char), qtdCaracteres, arq);                     //  Palavra
@@ -311,7 +308,8 @@ Lista* LeArqBinParaLista(Lista* lista){
             fread(informacao.linhas, sizeof(int), informacao.qtdOcorrencias, arq);          // Linhas de ocorrência
 
             printfLeArqBinParaLista(informacao, qtdCaracteres);
-
+    for (int i = 0; i < informacao.qtdOcorrencias; i++)
+        printf("[qtd%d][%d]%d\t", sizeof(informacao.linhas), i, informacao.linhas[i]);
             lista = InsereListaNoFinal(lista, informacao);
         }
     }
@@ -319,7 +317,7 @@ Lista* LeArqBinParaLista(Lista* lista){
 }
 
 void BuscaDePalavras(Lista* lista){
-    Lista* info;
+    Lista* informacoes;
 
     if(lista != NULL){
         char palavra[50];
@@ -328,10 +326,10 @@ void BuscaDePalavras(Lista* lista){
         fflush(stdin);
         gets(palavra);
 
-        info = Existe(lista, palavra);  // Verificar se a palavra existe
+        informacoes = Existe(lista, palavra);  // Verificar se a palavra existe
 
-        if(info != NULL)
-            MostraPalavra(info->info);
+        if(informacoes != NULL)
+            MostraPalavra(informacoes->info);
         else
             printf("\nA palavra \"%s\" nao conta no documento.\n", palavra);
     }
@@ -347,13 +345,13 @@ void Menu(){
         scanf("%d", &opc);
 
         system("pause");
-        // system("cls");
+        system("cls");
 
         switch (opc)
         {
             case 1: //  criar um índice para um arquivo texto
                 lista = LeArqTextoParaLista(lista, &qtdPalavras);
-
+                
                 CriaIndice(lista, qtdPalavras);
                 break;
 
@@ -362,7 +360,7 @@ void Menu(){
                 lista = LeArqBinParaLista(lista);
 
                 system("pause");
-                // system("cls");
+                system("cls");
 
                 BuscaDePalavras(lista);
 
