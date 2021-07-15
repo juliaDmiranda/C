@@ -73,8 +73,8 @@ void MostraPalavra(t_palavra info);
 
 //  Função para mostrar a leitura feita do arquivo "índice.dat"
 void printLeArqBinParaLista(t_palavra informacao, int qtdCaracteres);
- 
-//  Função para ler as informações do índice do arquivo "indice.dat" armazenando um uma lista
+
+//  Função para ler as informações do índice do arquivo "índice.dat" armazenando um uma lista
 Lista* LeArqBinParaLista(Lista* lista);
 
 //  Função para busca de palavras através do índice já existente
@@ -183,7 +183,7 @@ Lista *InsereLista(Lista *lista, char *palavra, int linha)
 
 
 void CriaIndice(Lista* lista, int qtdPalavras){
-    FILE* arq = fopen("indice.dat", "wb");  // Criar e abrir arquivo binário "indice.dat"
+    FILE* arq = fopen("índice.dat", "wb");  // Criar e abrir arquivo binário "índice.dat"
 
     Lista* aux = lista;
 
@@ -212,15 +212,15 @@ void CriaIndice(Lista* lista, int qtdPalavras){
 }
 
 Lista* LeArqTextoParaLista(Lista* lista, int* qtdPalavras){
-    char nomeDoArquivo[20] = "texto";
+    char nomeDoArquivo[20];
     char palavras[100];
     int linha = 0;
     FILE *arq;
 
-    // Perguntar o nome do arquivo texto
-    // printf("Insira o nome do arquivo: ");
-    //fflush(stdin);
-    //gets(nomeDoArquivo);
+    //Perguntar o nome do arquivo texto
+    printf("Insira o nome do arquivo: ");
+    fflush(stdin);
+    gets(nomeDoArquivo);
 
     arq = fopen(nomeDoArquivo, "r");
 
@@ -333,7 +333,7 @@ void printLeArqBinParaLista(t_palavra informacao, int qtdCaracteres){
 }
 
 Lista* LeArqBinParaLista(Lista* lista){
-    FILE* arq = fopen("indice.dat", "rb");
+    FILE* arq = fopen("índice.dat", "rb");
     int qtdPalavras = 0 , qtdCaracteres;
     t_palavra informacao;
 
@@ -373,9 +373,9 @@ void BuscaDePalavras(Lista* lista){
         char palavra[50];
 
         printf("> Palavra: ");          // Perguntar ao usuário a palavra
-        fflush(stdin);
-        gets(palavra);
-
+        // fflush(stdin);
+        // gets(palavra);
+        scanf("%s", palavra);
         informacoes = Existe(lista, palavra);  // Verificar se a palavra existe
 
         if(informacoes != NULL)
@@ -387,6 +387,7 @@ void BuscaDePalavras(Lista* lista){
 
 void Menu(){
     Lista* lista = InicializaLista();
+
     int opc, qtdPalavras = 0;
 
     while(1)
@@ -394,7 +395,7 @@ void Menu(){
         system("cls");
         printf ("<1> criar um indice para um arquivo texto;\n<2> utilizar um indice existente para realizar buscas por palavras;\n<3> encerrar o programa.\n> ");
         scanf("%d", &opc);
-
+        system("cls");
         switch (opc)
         {
             case 1: //  criar um índice para um arquivo texto
@@ -422,8 +423,10 @@ void Menu(){
                 printf("Opcao inva'lida.");
                 break;
             }
-    if(lista != NULL)
-        lista = DesalocaLista(lista);
-    system("pause");
+
+        if(lista != NULL)
+            lista = DesalocaLista(lista);
+        system("pause");
     }
+
 }
