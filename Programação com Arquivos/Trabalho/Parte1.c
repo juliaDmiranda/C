@@ -32,26 +32,35 @@ void MostrarLista(Lista *lista)
         printf("\n");
         aux = aux->prox;
     }
+    printf("\n\n");
+    system("pause");
+    system("cls");
 }
-
-// Função para liberar memória alocada para a lista
-Lista* DesalocaLista(Lista* lista);
-
-// Função para inicializar a lista
-Lista *InicializaLista();
 
 // Função para passar para letras minúsculas palavras que possuam letras maiúsculas
 void TransformaLetraMaiusculaEmMinuscula(char* palavra);
 
-// Função para inserir palavra em ordem alfabética na lista
-Lista *InsereLista(Lista *lista, char *palavra, int linha);
+// Função para inicializar a lista
+Lista *InicializaLista();
 
-// Função para inserir informações do índice em uma lista
-Lista * InsereListaNoFinal(Lista*lista, t_palavra informacao);
+// Função para liberar memória alocada para a lista
+Lista* DesalocaLista(Lista* lista);
 
 // Função para verificar se determinada palavra já foi posta na lista
 // Retorna: Ponteiro da palavra - palavra já existe, NULL - palavra não existe
 Lista *Existe(Lista *lista, char *palavra);
+
+// Função para criar novo elemento que será inserido na lista em ordem alfabética
+Lista* CriaElemento1(char* palavra, int linha);
+
+// Função para inserir palavra em ordem alfabética na lista
+Lista *InsereListaOrdenado(Lista *lista, char *palavra, int linha);
+
+// Função para criar novo elemento que será inserido ao final da lista
+Lista* CriaElemento2(t_palavra informacao);
+
+// Função para inserir informações do índice em uma lista
+Lista * InsereListaNoFinal(Lista*lista, t_palavra informacao);
 
 // Função para criar índice em arquivo binário "índice.h"
 void CriaIndice(Lista* lista, int qtdPalavras);
@@ -62,11 +71,14 @@ Lista* LeArqTextoParaLista(Lista* lista, int* qtdPalavras);
 //  Função para mostrar informações sobre a palavra buscada pelo usuário
 void MostraPalavra(t_palavra info);
 
-//  Função para busca de palavras através do índice já existente
-void BuscaDePalavras(Lista* Lista);
-
+//  Função para mostrar a leitura feita do arquivo "índice.dat"
+void printLeArqBinParaLista(t_palavra informacao, int qtdCaracteres);
+ 
 //  Função para ler as informações do índice do arquivo "indice.dat" armazenando um uma lista
 Lista* LeArqBinParaLista(Lista* lista);
+
+//  Função para busca de palavras através do índice já existente
+void BuscaDePalavras(Lista* Lista);
 
 //  Função de menu de opções do usuário
 void Menu();
@@ -124,11 +136,8 @@ Lista *Existe(Lista *lista, char *palavra)
     return NULL;
 }
 
-//Falta inserir em ordem alfabética
-Lista *InsereLista(Lista *lista, char *palavra, int linha)
-{
+Lista* CriaElemento1(char* palavra, int linha){
     Lista *nova_palavra = (Lista *)malloc(sizeof(Lista));
-
     nova_palavra->info.qtdOcorrencias = 1;
 
     strcpy(nova_palavra->info.letras, palavra);
@@ -137,45 +146,44 @@ Lista *InsereLista(Lista *lista, char *palavra, int linha)
 
     nova_palavra->info.linhas[0] = linha;
 
-    Lista *aux = lista;
-    nova_palavra->prox = lista;
+    nova_palavra->prox = NULL;
 
     return nova_palavra;
 }
 
-Lista * InsereListaNoFinal(Lista* lista, t_palavra informacao){
+//Falta inserir em ordem alfabética
+Lista *InsereLista(Lista *lista, char *palavra, int linha)
+{
+    Lista *aux, *ant;
+    Lista *nova_palavra = CriaElemento1(palavra, linha);
 
-    Lista* novaPalavra = (Lista*)malloc(sizeof(Lista));
-
-    strcpy(novaPalavra->info.letras, informacao.letras);
-
-    novaPalavra->info.linhas = (int*)malloc(informacao.qtdOcorrencias * sizeof(int));
-
-    for (int i = 0; i < informacao.qtdOcorrencias; i++)
-        novaPalavra->info.linhas[i] = informacao.linhas[i];
-
-    novaPalavra->info.qtdOcorrencias = informacao.qtdOcorrencias;
-
-    novaPalavra->prox = NULL;
+    aux = lista;
+    ant = NULL;
 
     if(lista != NULL){
-        Lista* aux = lista;
-        Lista* ant;
-
         while(aux != NULL){
+            if(strcmp(palavra, aux->info.letras) <= 0)
+                break;
             ant = aux;
             aux = aux->prox;
         }
-
-        ant->prox = novaPalavra;
+        if(ant == NULL){
+            nova_palavra->prox = lista;
+            lista = nova_palavra;
+        }
+        else{
+            nova_palavra->prox = ant->prox;
+            ant->prox = nova_palavra;
+        }
         return lista;
     }
 
-    return novaPalavra;
+    return nova_palavra;
 }
 
+
 void CriaIndice(Lista* lista, int qtdPalavras){
-    FILE* arq = fopen("indice.dat", "wb");                                     // Criar e abrir arquivo binário "indice.dat"
+    FILE* arq = fopen("indice.dat", "wb");  // Criar e abrir arquivo binário "indice.dat"
 
     Lista* aux = lista;
 
@@ -261,26 +269,66 @@ Lista* LeArqTextoParaLista(Lista* lista, int* qtdPalavras){
 }
 
 void MostraPalavra(t_palavra info){
-    printf("Quantidade de Ocorrencias: %d\nAparicoes(por linha):", info.qtdOcorrencias);
+    printf("> Quantidade de Ocorrencias: %d\n> Aparece na(s) linha(s):", info.qtdOcorrencias);
 
     for (int i = 0; i < info.qtdOcorrencias; i++)
-        printf("\t%d", info.linhas[i]);
+        if(i == info.qtdOcorrencias - 1)
+            printf(" %d", info.linhas[i]);
+        else
+            printf(" %d,", info.linhas[i]);
 
     printf("\n");
-
-    system("pause");
-
-    system("cls");
 }
 
-void printfLeArqBinParaLista(t_palavra informacao, int qtdCaracteres){
-    printf("%d\t", qtdCaracteres);
-    printf("%s\t", informacao.letras);
-    printf("%d\t", informacao.qtdOcorrencias);
+Lista* CriaElemento2(t_palavra informacao){
+    Lista* novaPalavra = (Lista*)malloc(sizeof(Lista));
+
+    strcpy(novaPalavra->info.letras, informacao.letras);
+
+    novaPalavra->info.linhas = (int*)malloc(informacao.qtdOcorrencias * sizeof(int));
 
     for (int i = 0; i < informacao.qtdOcorrencias; i++)
-        printf("[qtd%d][%d]%d\t", sizeof(informacao.linhas), i, informacao.linhas[i]);
-    
+        novaPalavra->info.linhas[i] = informacao.linhas[i];
+
+    novaPalavra->info.qtdOcorrencias = informacao.qtdOcorrencias;
+
+    novaPalavra->prox = NULL;
+
+    return novaPalavra;
+}
+
+Lista* InsereListaNoFinal(Lista *lista, t_palavra informacao){
+    Lista *novaPalavra  = CriaElemento2(informacao);
+    Lista *aux = lista;
+    Lista *ant = NULL;
+
+    if(lista != NULL){
+
+        while(aux != NULL)
+        {
+            ant = aux;
+            aux = aux->prox;
+        }
+
+        ant->prox = novaPalavra;
+
+        return lista;
+    }else
+        return novaPalavra;
+
+}
+
+void printLeArqBinParaLista(t_palavra informacao, int qtdCaracteres){
+    printf("qtdCaracteres: %d\t", qtdCaracteres);
+    printf("letras: %s\t", informacao.letras);
+    printf("qtdOcorrencias: %d\t", informacao.qtdOcorrencias);
+    printf("linhas: ");
+    for (int i = 0; i < informacao.qtdOcorrencias; i++)
+        if(i == informacao.qtdOcorrencias - 1)
+            printf(" %d", informacao.linhas[i]);
+        else
+            printf(" %d,", informacao.linhas[i]);
+
     printf("\n\n");
 }
 
@@ -296,25 +344,27 @@ Lista* LeArqBinParaLista(Lista* lista){
 
         printf("%d\n", qtdPalavras);
 
-        while(feof(arq) == 0){
+        for(int i=0; i < qtdPalavras; i++){
             fread(&qtdCaracteres, sizeof(int), 1, arq);                                     // Quantidade de caracteres
 
             fread(informacao.letras, sizeof(char), qtdCaracteres, arq);                     //  Palavra
 
             fread(&informacao.qtdOcorrencias, sizeof(int), 1, arq);                         //  Quantidade de ocorrências
-            
+
             informacao.linhas = (int*)malloc((informacao.qtdOcorrencias) * sizeof(int));
 
             fread(informacao.linhas, sizeof(int), informacao.qtdOcorrencias, arq);          // Linhas de ocorrência
 
-            printfLeArqBinParaLista(informacao, qtdCaracteres);
-    for (int i = 0; i < informacao.qtdOcorrencias; i++)
-        printf("[qtd%d][%d]%d\t", sizeof(informacao.linhas), i, informacao.linhas[i]);
+            printLeArqBinParaLista(informacao, qtdCaracteres);
+
             lista = InsereListaNoFinal(lista, informacao);
         }
+
+        return lista;
     }
-    return lista;
+    return NULL;
 }
+
 
 void BuscaDePalavras(Lista* lista){
     Lista* informacoes;
@@ -331,7 +381,7 @@ void BuscaDePalavras(Lista* lista){
         if(informacoes != NULL)
             MostraPalavra(informacoes->info);
         else
-            printf("\nA palavra \"%s\" nao conta no documento.\n", palavra);
+            printf("\nA palavra \"%s\" nao consta no documento.\n", palavra);
     }
 }
 
@@ -341,18 +391,16 @@ void Menu(){
 
     while(1)
     {
+        system("cls");
         printf ("<1> criar um indice para um arquivo texto;\n<2> utilizar um indice existente para realizar buscas por palavras;\n<3> encerrar o programa.\n> ");
         scanf("%d", &opc);
-
-        system("pause");
-        system("cls");
 
         switch (opc)
         {
             case 1: //  criar um índice para um arquivo texto
                 lista = LeArqTextoParaLista(lista, &qtdPalavras);
-                
-                CriaIndice(lista, qtdPalavras);
+                if(lista != NULL)
+                    CriaIndice(lista, qtdPalavras);
                 break;
 
             case 2: //  utilizar um índice existente para realizar buscas por palavras
@@ -374,9 +422,8 @@ void Menu(){
                 printf("Opcao inva'lida.");
                 break;
             }
-    }
-
     if(lista != NULL)
         lista = DesalocaLista(lista);
-
+    system("pause");
+    }
 }
