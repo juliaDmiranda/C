@@ -1,17 +1,13 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+//Lemebrar de ler linha toda e usar strtok
 
 enum algo_heap{First = 1, Best};
 
 enum tipo_instrucao{set_heap = 1, new , del , exibe , atribui};
 
-// Definir estrutura para cada variável criada
-    //Campos:
-        // nome da variável
-        // tamanho da memória referenciada
-        // posições da heap que esla está referenciando (vetor dinÂmico para alocar apartir do tamanho a ser alocado)
-        // Ponteiro par ao proóximo
+enum status_var{sofreuDel = -1};
 
 // Estrutura com informações de uma variável declarada no programa
 typedef struct Variavel{
@@ -30,11 +26,6 @@ void* InicializarLista(){
     return NULL;
 }
 
-// Definir lista que conterá o registro de áreas livres do heap
-    //Campos
-        // Endereço inicial da área livre
-        // qtd fe blocos livres contíguos da área
-
 // Estrutura de área livre do bloco
 typedef struct AreaLivre{
     int inicio;                 // Posição do primeiro bloco livre no heap
@@ -46,10 +37,6 @@ typedef struct ListaDeAreasLivres{
     t_areaLivre info;                   // Informações do nó
     struct ListaDeAreasLivres *prox;    // Ponteiro para o próximo
 }l_areaLivre;
-
-// Definir  estrutura de instrução
-    // Campos:
-        //strinf: tam 30+
 
 // Estrutura para guardar partes da instrução // Inicializadas em '*'
 typedef struct Instrucao{
@@ -69,6 +56,9 @@ l_areaLivre* BestFit();
 ///Implementação do Worst fit
 // Função que executa o algoritmo first fit
 l_areaLivre* WorstFit();
+
+// Função para atualizar estado do vetor heap
+void AtualizarHeap(int *heap);
 
 // Função para realizar a atribuição
 void Atribuir();
@@ -96,7 +86,7 @@ int main(){
     int heap[100] = {0}; // Estrutura do heap inicializada em 0's
     int marcadorHeap; //Marcador da implementação do momento
     char nomeDoArquivo[20] = "prog";
-/*     printf("Nome do programa: ");
+/*   printf("Nome do programa: ");
     fflush(stdin);
     gets(nomeDoArquivo); */
     ExecutarPrograma(nomeDoArquivo);
@@ -119,18 +109,28 @@ l_areaLivre* WorstFit(){
 
 }
 
+void AtualizarHeap(int *heap);
 
 void Atribuir(){
+    printf("\nAtribuir\n");
+    system("pause");
+    system("cls");
     // Atualiza lista de áreas livres pois, b não vai mais apontar para (se tiver coletor????)
     // Mudar campos de b para os campos de a
 }
 
 
 void ConfigurarHeap(){
+    printf("\nConfigurarHea\n");
+    system("pause");
+    system("cls");
     //atrualizar marcado da implementação do momento (talvez por essa enumeração com um enum)
 }
 
 void Declarar(){
+    printf("\nDeclarar\n");
+    system("pause");
+    system("cls");
     // Criar novo elemento para a lista de variáveis
     // Verificar marcado de implementação do heap do momento
     // Utilizar lista de áreas livres
@@ -138,20 +138,27 @@ void Declarar(){
 }
 
 void Deletar(){
+    printf("\nDeletar\n");
+    system("pause");
+    system("cls");
     // Procura na lista de variáveis a variável
-    //Se não achar : variável não está lá
-    //Se achar: Variável está lá
-    //Verificar se outra variável está referenciando essa mesma área
-    // Se não
-    // Atualiza a lista de áreas livres
-    // Atualiza heap nos campos que não estão sendo referenciados para 0
+    //Se não achar : variável não está lá 
 
-    // Se sim (vai servir também par ao se não - pelo menos para o final dele)
-    // Desaloca o que foi aloca/ se foi alocado algum dos campos da variável
-    // Retira nó de variável da lista
-}
+    //Se achar: Variável está lá
+        //Verificar se outra variável está referenciando essa mesma área
+        // Se não
+            // Atualiza a lista de áreas livres
+            // Atualiza heap nos campos que não estão sendo referenciados para 0
+
+        // Se sim 
+            // Variável tem no campo do bloco '-1' significando que não 
+            // Retira nó de variável da lista
+    }
 
 void Exibe(){
+    printf("\nExibe\n");
+    system("pause");
+    system("cls");
     // Mostrar estrutura da heap
     // Onde for 1 coloca * e onde for 0 não coloca nada
     // Imprime todas as variáveis
@@ -207,11 +214,9 @@ void ExecutarPrograma(char *nomeDoPrograma){
             indice = 0;
             printf("\nInstrucao---> %s", instrucao);
 
-
             //(verificar de dá certo depois)for(palavra = strtok(instrucao, " "), indice = 0; palavra != NULL, indice < 3; palavra = strtok(NULL, " "), indice++);
-
+            /* 
             palavra = strtok(instrucao, " ");
-
             while (palavra != NULL)                                 // Análise de cada palavra da instrução
             {    
                 strcpy(vet_instrucao[indice].str, palavra);         // Copiando para o vetor de cada palavra da instrução
@@ -219,7 +224,15 @@ void ExecutarPrograma(char *nomeDoPrograma){
                 indice++;
 
                 palavra = strtok(NULL, " ");
+            } 
+            */
+
+            for(palavra = strtok(instrucao, " "); palavra != NULL; palavra = strtok(NULL, " "))
+            {
+                strcpy(vet_instrucao[indice].str, palavra);         // Copiando para o vetor de cada palavra da instrução
+                indice++;
             }
+
 
             // Verificar o tipo de operação (<set_heap> | <new> | <del> | <exibe> | <atribui>)
             tipoDeInstrucao = VerificarInstrucao(vet_instrucao);
@@ -251,6 +264,7 @@ void ExecutarPrograma(char *nomeDoPrograma){
     }
 
     fclose(arq);
+
     while(!feof(arq)){
 
     }
