@@ -26,9 +26,11 @@ l_areaLivre* FirstFit();
 
 (OK)  void MostrarVariaveis(listaVar);
    
-l_areaLivre* NovoElementoAreaLivre(int inicioDeAreaLivre, int qtdBlocosContiguos);
+(OK)  l_areaLivre* NovoElementoAreaLivre(int inicioDeAreaLivre, int qtdBlocosContiguos);
 
-l_variavel* NovoElementoVariavel();
+(OK)  l_variavel* NovoElementoVariavel();
+
+(OK)  void InserirListaDeVar(l_variavel **listaVar,int  n_inicioAlocado,int  qtdBlocosContiguos, char *nome)
 
 (OK)  int VerificarInstrucao(t_instrucao *instrucao); 
 
