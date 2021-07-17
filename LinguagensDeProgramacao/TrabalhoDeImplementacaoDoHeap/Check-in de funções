@@ -27,3 +27,5 @@ l_variavel* NovoElementoVariavel();
 (OK)  int VerificarInstrucao(t_instrucao *instrucao); 
 
 l_areaLivre* WorstFit();
+
+(OK)  void MostraAreasLivres(l_areaLivre* lista);
