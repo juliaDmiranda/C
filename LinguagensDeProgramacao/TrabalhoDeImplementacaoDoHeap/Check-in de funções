@@ -4,7 +4,7 @@ void Atribuir();
 
 l_areaLivre* BestFit();
 
-void ConfigurarHeap();
+(OK)  void ConfigurarHeap();
 
 void Declarar();
 
