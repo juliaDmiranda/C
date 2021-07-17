@@ -10,7 +10,7 @@ void Declarar();
 
 void Deletar();
 
-void Exibe();
+(OK)  void Exibe();
 
 void ExecutarPrograma(char *nomeDoPrograma);
 
@@ -18,8 +18,14 @@ l_areaLivre* FirstFit();
 
 (OK)  l_areaLivre* InicializarListaAreaLivre();
 
-l_variavel* InicializarListaVariavel();
+(OK)  l_variavel* InicializarListaVariavel();
 
+(OK)  void MostraAreasLivres(l_areaLivre* lista);
+
+(OK)  void MostrarHeap(heap);
+
+(OK)  void MostrarVariaveis(listaVar);
+   
 l_areaLivre* NovoElementoAreaLivre(int inicioDeAreaLivre, int qtdBlocosContiguos);
 
 l_variavel* NovoElementoVariavel();
@@ -28,4 +34,4 @@ l_variavel* NovoElementoVariavel();
 
 l_areaLivre* WorstFit();
 
-(OK)  void MostraAreasLivres(l_areaLivre* lista);
+
