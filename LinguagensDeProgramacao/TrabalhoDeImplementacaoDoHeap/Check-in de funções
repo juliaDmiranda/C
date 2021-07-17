@@ -1,0 +1,29 @@
+void AtualizarHeap(int *heap);
+
+void Atribuir();
+
+l_areaLivre* BestFit();
+
+void ConfigurarHeap();
+
+void Declarar();
+
+void Deletar();
+
+void Exibe();
+
+void ExecutarPrograma(char *nomeDoPrograma);
+
+l_areaLivre* FirstFit();
+
+l_areaLivre* InicializarListaAreaLivre();
+
+l_variavel* InicializarListaVariavel();
+
+l_areaLivre* NovoElementoAreaLivre(int inicioDeAreaLivre, int qtdBlocosContiguos);
+
+l_variavel* NovoElementoVariavel();
+
+(OK)  int VerificarInstrucao(t_instrucao *instrucao); 
+
+l_areaLivre* WorstFit();
