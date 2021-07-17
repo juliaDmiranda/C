@@ -16,7 +16,7 @@ void ExecutarPrograma(char *nomeDoPrograma);
 
 l_areaLivre* FirstFit();
 
-l_areaLivre* InicializarListaAreaLivre();
+(OK)  l_areaLivre* InicializarListaAreaLivre();
 
 l_variavel* InicializarListaVariavel();
 
