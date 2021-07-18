@@ -1,6 +1,6 @@
 (OK)  void AtualizarHeap(int *heap);
 
-void Atribuir();
+(OK)  void Atribuir(l_variavel** listaVar, t_instrucao *instrucao, int *heap);
 
 l_areaLivre* BestFit();
 
@@ -11,6 +11,8 @@ void Declarar();
 void Deletar();
 
 (OK)  void Exibe();
+
+(OK)  int Existe(l_variavel** listaVar,char* nome,int n_inicioAlocado,int qtdBlocosContiguos)
 
 void ExecutarPrograma(char *nomeDoPrograma);
 
