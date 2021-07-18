@@ -1,4 +1,4 @@
-void AtualizarHeap(int *heap);
+(OK)  void AtualizarHeap(int *heap);
 
 void Atribuir();
 
