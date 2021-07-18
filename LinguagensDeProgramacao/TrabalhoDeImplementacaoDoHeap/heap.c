@@ -79,8 +79,15 @@ l_areaLivre* WorstFit();
 // Função para atualizar estado do vetor heap
 void AtualizarHeap(int *heap, int indiceInicial, int indiceFinal, int status);
 
+//  Função para procurar variável e retornar os valores do bloco inicial do heap para o qual ela aponta e quantos blocos contíguos apartir desse bloco inicial ocupa
+// Retorna 0 se variável já foi declarada - 1 caso contrário
+int ProcuraVariaveis(l_variavel **lista, char *var, int *inicioDeBloco, int *blocosContiguos);
+
+//  Função auxiliar da atribuição de ponteiros, que faz a variável da esquerda apontar para a mesma área que a área da direita aponta
+void  Atribuir_aux(l_variavel **lista,char *e_var, int inicioDeBloco, int blocosContiguos);
+
 // Função para realizar a atribuição
-void Atribuir();
+void Atribuir(l_variavel** listaVar, t_instrucao *instrucao, int *heap);
 
 // Função de configuração do algoritmo para evitar segmentação externa do heap
 void ConfigurarHeap(t_instrucao *instrucao);
@@ -218,29 +225,67 @@ void InserirListaDeVar(l_variavel **listaVar,int  n_inicioAlocado,int  qtdBlocos
 } */
 
 void AtualizarHeap(int *heap, int indiceInicial, int indiceFinal, int status){
-    for (int i = indiceInicial; i < indiceFinal; i++)
-        heap[i] = status;
+    int max = indiceInicial + indiceFinal;
+    for(int i = indiceInicial; i < max; i++){
+        heap[i] = status;}
+
 }
 
-void Atribuir(){
-/*     printf("\nAtribuir\n");
-    system("pause");
-    system("cls"); */
-    // Atualiza lista de áreas livres pois, b não vai mais apontar para (se tiver coletor????)
-    // Mudar campos de b para os campos de a
-    
+int ProcuraVariaveis(l_variavel **lista, char *var, int *inicioDeBloco, int *blocosContiguos){
+    l_variavel* aux = (*lista);
+
+    while(aux != NULL){
+        if(!strcmp(aux->info.nome, var)){
+            (*inicioDeBloco) = aux->info.blocoInicial;
+            (*blocosContiguos) = aux->info.qtdMem;
+            return 0;
+        }
+        aux = aux->prox;
+    }
+
+    return 1;
+}
+
+void  Atribuir_aux(l_variavel **lista,char *e_var, int inicioDeBloco, int blocosContiguos){
+    l_variavel *aux = (*lista);
+
+    while(aux != NULL){
+        if(!strcmp(aux->info.nome, e_var))
+        {
+            aux->info. blocoInicial = inicioDeBloco;
+            aux->info.qtdMem = blocosContiguos;
+        }
+
+        aux = aux->prox;
+    }
+}
+
+void Atribuir(l_variavel** listaVar, t_instrucao *instrucao, int *heap){
+    int e_varInicioDeBloco, d_varInicioDeBloco, e_varBlocosContiguos, d_varBlocosContiguos;
+    int resp;
     // Verificar se b já referenciou alguma área
-        // sim
-            //atualiza lista de lixo
-            // area do heap recebe -2 que sifnifica lixo
-        // tranquilo
+    
+    // Procurar quais áreas a variável da esquerda referencia
+    resp = ProcuraVariaveis(listaVar, instrucao[0].str, &e_varInicioDeBloco, &e_varBlocosContiguos);
+
+    // Procurar quais áreas a variável da direita referencia
+    ProcuraVariaveis(listaVar, instrucao[2].str, &d_varInicioDeBloco, &d_varBlocosContiguos);
+        
+    if(!resp)
+    {
+        // Fazer variável da esquerda apontar para a mesma área da variável da direita
+        Atribuir_aux(listaVar, instrucao[0].str, d_varInicioDeBloco, d_varBlocosContiguos);
+        
+        if(e_varInicioDeBloco != sofreuDel)
+            AtualizarHeap(heap, e_varInicioDeBloco, e_varBlocosContiguos, lixo);
+    }else{
+        InserirListaDeVar(listaVar, d_varInicioDeBloco, d_varBlocosContiguos, instrucao[2].str);
+    }
+    
 }
 
 void ConfigurarHeap(t_instrucao *instrucao){
-    printf("\nConfigurarHea analisando %s\n", instrucao[1].str);
-    system("pause");
-    system("cls");
-
+    
     if(!strcmp(instrucao[1].str, "first"))
         MARCADOR_HEAP = First_Fit;
 
@@ -248,13 +293,68 @@ void ConfigurarHeap(t_instrucao *instrucao){
         MARCADOR_HEAP = Best_Fit;
 }
 
-void Declarar(int* heap, l_variavel **listaVar, l_areaLivre **listaAreaLivre, t_instrucao* instrucao){
-/*     printf("\nDeclarar\n");
+void MostrarHeap(int* heap){
+    for (int i = 0; i < TAM_HEAP; i++)
+    {
+        switch(heap[i]){
+            case livre:
+                if( i == 0 )
+                    printf("|   |");
+                else
+                    printf("   |");
+                break;
+            
+            case alocado:
+                if( i == 0 )
+                    printf("| * |");
+                else
+                    printf(" * |");
+            
+                break;
+            
+            case lixo:
+                if( i == 0 )
+                    printf("|lixo|");
+                else
+                    printf("lixo|");
+        
+                break;
+            
+            default:
+                break;
+        }
+    /*     if(heap[i] == livre){
+            if( i == 0 )
+                printf("|   |");
+            else
+                printf("   |");
+                
+        }else if(heap[i] == alocado){
+            if( i == 0 )
+                printf("| * |");
+            else
+                printf(" * |");
+        }else if(heap[i] == lixo){
+            if( i == 0 )
+                printf("|lixo|");
+            else
+                printf("lixo|");
+        } */
+    
+    }
+    printf("\n");
     system("pause");
-    system("cls"); */
+    system("cls");
+}
+
+
+void Declarar(int* heap, l_variavel **listaVar, l_areaLivre **listaAreaLivre, t_instrucao* instrucao){
+
     int n_inicioAlocado;
     int resp = 0 ; // Resposta da operação
     int mem = atoi(instrucao[2].str);
+    
+    n_inicioAlocado = mem * 5;
 
     // Verificar marcado de implementação do heap do momento
     if(MARCADOR_HEAP == First_Fit)
@@ -268,6 +368,7 @@ void Declarar(int* heap, l_variavel **listaVar, l_areaLivre **listaAreaLivre, t_
                 
         // Atualizar heap, as áreas utilizadas para 1(???)
         AtualizarHeap(heap, n_inicioAlocado, mem, alocado);
+        MostrarHeap(heap);
     }                    
 
 }
@@ -275,7 +376,6 @@ void Declarar(int* heap, l_variavel **listaVar, l_areaLivre **listaAreaLivre, t_
 void MostrarOutrasVariaveis(char* nome, int inicioBlocoLivre){
     printf("- %s tambe'm referencia o bloco %d\n", nome, inicioBlocoLivre);
 }
-
 
 void VerificarOutrasVariaveis(l_variavel** lista, int inicioBlocoLivre){
     l_variavel* auxVar = (*lista);
@@ -335,30 +435,6 @@ void Deletar(int *heap, l_variavel** listaVar, l_areaLivre** listaArea, char *va
    
 }
 
-void MostrarHeap(int* heap){
-    for (int i = 0; i < TAM_HEAP; i++)
-    {
-        if(heap[i] == livre){
-            if( i == 0 )
-                printf("|   |");
-            else
-                printf("   |");
-        }else if(heap[i] == alocado){
-            if( i == 0 )
-                printf("| * |");
-            else
-                printf(" * |");
-        }else if(heap[i] == lixo){
-            if( i == 0 )
-                printf("|lixo|");
-            else
-                printf("lixo|");
-        }
-    }
-    printf("\n");
-    system("pause");
-    system("cls");
-}
 
 void Exibe(l_variavel* listaVar, l_areaLivre* listaArea, int* heap){
     printf("\nExibe\n");
@@ -425,7 +501,7 @@ void ExecutarPrograma(char *nomeDoPrograma){
             linha++;
             indice = 0;
 
-            printf("\n%d| %s",linha, instrucao);
+            printf("\n%d| %s\n",linha, instrucao);
 
             for(palavra = strtok(instrucao, " "); palavra != NULL; palavra = strtok(NULL, " "))
             {
