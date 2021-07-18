@@ -81,7 +81,7 @@ void AtualizarHeap(int *heap, int indiceInicial, int indiceFinal, int status);
 
 //  Função para procurar variável e retornar os valores do bloco inicial do heap para o qual ela aponta e quantos blocos contíguos apartir desse bloco inicial ocupa
 // Retorna 0 se variável já foi declarada - 1 caso contrário
-int ProcuraVariaveis(l_variavel **lista, char *var, int *inicioDeBloco, int *blocosContiguos);
+int ProcuraVariavel(l_variavel **lista, char *var, int *inicioDeBloco, int *blocosContiguos);
 
 //  Função auxiliar da atribuição de ponteiros, que faz a variável da esquerda apontar para a mesma área que a área da direita aponta
 void  Atribuir_aux(l_variavel **lista,char *e_var, int inicioDeBloco, int blocosContiguos);
@@ -134,8 +134,7 @@ void MostrarAreasLivres(l_areaLivre* lista){
 
         aux = aux->prox;
     }
-    // system("pause");
-    // system("cls");
+
 }
 
 l_areaLivre* NovoElementoAreaLivre(int inicioDeAreaLivre, int qtdBlocosContiguos){
@@ -164,14 +163,16 @@ void MostrarVariaveis(l_variavel *lista){
         l_variavel *aux = lista;
 
         while(aux != NULL){
-            printf("%s -  Blocos alocados: %d   --  Inicio: %d\n", aux->info.nome, aux->info.qtdMem, aux->info.blocoInicial);
-            printf("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _  _ _ \n");
+            if(aux->info.blocoInicial == -1)
+                printf("%s -  nao referencia a'rea no heap\n", aux->info.nome);
+            else
+                printf("%s -  Blocos alocados: %d   --  Inicio: %d\n", aux->info.nome, aux->info.qtdMem, aux->info.blocoInicial);
+            // printf("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _  _ _ \n");
 
             aux = aux->prox;
         }
     }
-    // system("pause");
-    // system("cls");
+
 }
 
 l_variavel* InicializarListaVariavel(){
@@ -190,21 +191,46 @@ l_variavel* NovoElementoVariavel(char *nome, int blocoInicial, int qtdBlocosCont
     return novaVar; 
 }
 
+int Existe(l_variavel** listaVar,char* nome,int n_inicioAlocado,int qtdBlocosContiguos){
+    l_variavel* aux = (*listaVar);
+
+    if((*listaVar) == NULL)
+        return 1;
+    else{
+        while(aux != NULL)
+        {
+            if(!strcmp(aux->info.nome, nome))
+            {
+                aux->info.blocoInicial = n_inicioAlocado;
+                aux->info.qtdMem = qtdBlocosContiguos;
+                return 0;
+            }
+            aux = aux->prox;
+        }
+        return 1;
+    }
+}
+
 void InserirListaDeVar(l_variavel **listaVar,int  n_inicioAlocado,int  qtdBlocosContiguos, char *nome){
-    l_variavel* novaVar = NovoElementoVariavel(nome, n_inicioAlocado, qtdBlocosContiguos);
+    int resp = Existe(listaVar, nome, n_inicioAlocado, qtdBlocosContiguos);
+    
+    if(resp == 1)
+    {
+        l_variavel* novaVar = NovoElementoVariavel(nome, n_inicioAlocado, qtdBlocosContiguos);
         l_variavel* aux = (*listaVar);
         l_variavel* ant = NULL;
 
-    if((*listaVar) != NULL){
-        while(aux != NULL)
-        {
-            ant = aux;
-            aux = aux->prox;
+        if((*listaVar) == NULL)
+            (*listaVar) = novaVar;
+        else{
+            while(aux != NULL)
+            {
+                ant = aux;
+                aux = aux->prox;
+            }
+            ant->prox = novaVar;
         }
-        ant->prox = novaVar;
     }
-    else
-        (*listaVar) = novaVar;
 }
 
 // retornar 
@@ -231,7 +257,7 @@ void AtualizarHeap(int *heap, int indiceInicial, int indiceFinal, int status){
 
 }
 
-int ProcuraVariaveis(l_variavel **lista, char *var, int *inicioDeBloco, int *blocosContiguos){
+int ProcuraVariavel(l_variavel **lista, char *var, int *inicioDeBloco, int *blocosContiguos){
     l_variavel* aux = (*lista);
 
     while(aux != NULL){
@@ -266,10 +292,10 @@ void Atribuir(l_variavel** listaVar, t_instrucao *instrucao, int *heap){
     // Verificar se b já referenciou alguma área
     
     // Procurar quais áreas a variável da esquerda referencia
-    resp = ProcuraVariaveis(listaVar, instrucao[0].str, &e_varInicioDeBloco, &e_varBlocosContiguos);
+    resp = ProcuraVariavel(listaVar, instrucao[0].str, &e_varInicioDeBloco, &e_varBlocosContiguos);
 
     // Procurar quais áreas a variável da direita referencia
-    ProcuraVariaveis(listaVar, instrucao[2].str, &d_varInicioDeBloco, &d_varBlocosContiguos);
+    ProcuraVariavel(listaVar, instrucao[2].str, &d_varInicioDeBloco, &d_varBlocosContiguos);
         
     if(!resp)
     {
@@ -294,9 +320,7 @@ void ConfigurarHeap(t_instrucao *instrucao){
 }
 
 void MostrarHeap(int* heap){
-    char vet[80] = {"-"};
     
-    puts(vet); 
     for (int i = 0; i < TAM_HEAP; i++)
     {
         switch(heap[i]){
@@ -345,11 +369,9 @@ void MostrarHeap(int* heap){
         } */
     
     }
-    puts(vet); 
 
     printf("\n");
-    // system("pause");
-    // system("cls");
+
 }
 
 
@@ -368,7 +390,7 @@ void Declarar(int* heap, l_variavel **listaVar, l_areaLivre **listaAreaLivre, t_
     else if(MARCADOR_HEAP == Best_Fit)
         BestFit(&resp, listaAreaLivre, &n_inicioAlocado, mem); */
    
-    if(!resp)
+    if(!resp) // Se tinha memória suficiente para a alocação
     {
         // Criar novo elemento para a lista de variáveis
         InserirListaDeVar(listaVar, n_inicioAlocado, mem, instrucao[1].str);
@@ -379,7 +401,7 @@ void Declarar(int* heap, l_variavel **listaVar, l_areaLivre **listaAreaLivre, t_
 }
 
 void MostrarOutrasVariaveis(char* nome, int inicioBlocoLivre){
-    printf("- %s tambe'm referenciava o bloco %d\n", nome, inicioBlocoLivre);
+    printf("\n<AVISO> %s tambe'm referenciava o bloco %d\n", nome, inicioBlocoLivre);
 }
 
 void VerificarOutrasVariaveis(l_variavel** lista, int inicioBlocoLivre){
@@ -399,8 +421,7 @@ void VerificarOutrasVariaveis(l_variavel** lista, int inicioBlocoLivre){
 
 void Deletar(int *heap, l_variavel** listaVar, l_areaLivre** listaArea, char *variavel){
 /*     printf("\nDeletar\n");
-    // system("pause");
-    // system("cls"); */
+ */
     
     int n_blocoLivre, n_blocosContiguosLivres; // guarda informação da área que for liberada (bloco inicial e áreas contiguas á ele)
     
@@ -448,8 +469,7 @@ void Exibe(l_variavel* listaVar, l_areaLivre* listaArea, int* heap){
     MostrarVariaveis(listaVar);
     // lista de áreas livres (talvez?)
     // MostrarAreasLivres(listaArea);
-    // system("pause");
-    // system("cls");
+
 }
 
 int VerificarInstrucao(t_instrucao *vet_instrucao){
@@ -536,6 +556,8 @@ void ExecutarPrograma(char *nomeDoPrograma){
                 default:
                     break;
             }
+            system("pause");
+            system("cls");
 
         }
         fclose(arq);
