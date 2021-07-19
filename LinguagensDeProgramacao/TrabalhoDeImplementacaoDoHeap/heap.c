@@ -95,8 +95,8 @@ void ConfigurarHeap(t_instrucao *instrucao);
 // Função para realizar a instrução de declaração
 void Declarar(int* heap, l_variavel **listaVar, l_areaLivre **listaAreaLivre, t_instrucao* intrucao);
 
-//  Função para atualizar lista de variáveis livres após deletar uma variável
-void AtualizarListaDeAreasLivres(l_areaLivre **listaArea,int  n_blocoLivre, int n_blocosContiguosLivres);
+//  Função para atualizar lista de variáveis livres após deletar uma variável, liberando espaço no heap nas áreas desalocadas insedindo-as novamente na lsita de variáveis livres
+void LiberarListaDeAreasLivres(l_areaLivre **listaArea,int  n_blocoLivre, int n_blocosContiguosLivres);
 
 //  Função para verificar se existem outras variáveis que apontam para a mesma área de memória que a variável deletada
 void VerificarOutrasVariaveis(l_variavel** lista, int inicioBlocoLivre);
@@ -234,21 +234,7 @@ void InserirListaDeVar(l_variavel **listaVar,int  n_inicioAlocado,int  qtdBlocos
 }
 
 // retornar 
-/* void FirstFit(int *resp, l_areaLivre **listaAreaLivre, int *n_inicioAlocado, int mem){
-        // Utilizar lista de áreas livres
 
-    //se deu para alocar
-    (*resp) = 0;
-
-} */
-
-/* void BestFit(int *resp, l_areaLivre **listaAreaLivre, int *n_inicioAlocado, int mem){
-        // Utilizar lista de áreas livres
-
-    //se deu para alocar
-    (*resp) = 0;
-
-} */
 
 void AtualizarHeap(int *heap, int indiceInicial, int indiceFinal, int status){
     int max = indiceInicial + indiceFinal;
@@ -374,6 +360,132 @@ void MostrarHeap(int* heap){
 
 }
 
+// A lista de área livre deve está ordenada em ordem crescente tendo como chave o índice do bloco inicial
+void InserirAreaLivre(l_areaLivre **listaAre, int inicio, int qtdBlocos){
+    l_areaLivre *nova = NovoElementoAreaLivre(inicio, qtdBlocos);
+    l_areaLivre *aux = (*listaAre);
+    l_areaLivre* ant = NULL;
+
+    if((*listaAre) != NULL){
+        while(aux != NULL){
+            if(aux->info.inicio > inicio)
+                break;
+            ant = aux;
+            aux = aux->prox;
+        }
+        if(ant == NULL){
+            nova->prox = (*listaAre);
+
+            (*listaAre) = nova;
+        }
+        else{
+            ant->prox = nova;
+            nova->prox = aux;
+        }
+    }
+
+    (*listaAre) = nova;
+}
+
+void LiberarListaDeAreasLivres(l_areaLivre **listaArea,int  n_blocoLivre, int n_blocosContiguosLivres){
+    l_areaLivre *aux = (*listaArea);
+    //l_areaLivre *cpy_anteriorLivre = NULL; // cópia de ponteiro da área livre anterior e contígua á área liberada
+    
+    int indiceAnteriorAoPrimeiroBloco = n_blocoLivre - 1; // guarda valor do índice anterior
+    int indicePosteriorAoUltimoBloco = (n_blocoLivre + (n_blocosContiguosLivres - 1)) + 1;
+    int tmp_inicio, tmp_final; // guardam  valor de onde começa/termina provável a área posterior/anterior ao conjunto de blocos liberados
+    
+    // Procurar áreas livres que são contíguas a essa área liberada (no máxima área posterior á ele e anterior sendo emscladas)
+    while(aux != NULL){
+        tmp_final = aux->info.inicio + (aux->info.qtdBlocosContiguos - 1);
+        tmp_inicio = aux->info.inicio + (aux->info.qtdBlocosContiguos - 1);
+
+        // Verifica se o bloco anterior a ele está livre
+        if(tmp_final == indiceAnteriorAoPrimeiroBloco){
+            // une quantidade com n_blocosContiguosLivres
+            aux->info.qtdBlocosContiguos = aux->info.qtdBlocosContiguos + n_blocosContiguosLivres;
+            if(aux->prox->info.inicio == indicePosteriorAoUltimoBloco){ // Verifica se o bloco posterior a ele está livre
+                aux->info.qtdBlocosContiguos = aux->info.qtdBlocosContiguos + aux->prox->info.qtdBlocosContiguos;
+                break;
+            }
+            //guarda cópia de ponteiro do anterior escolhido para caso o posterior seja encontrado faça-se a união utilizando esse ponteiro
+        }
+        else if(tmp_inicio == indicePosteriorAoUltimoBloco){
+            // Verifica se o bloco posterior a ele está livre
+            // une qtdBlocosContiguosLivres do posterior com do anterior
+            aux->info.inicio = n_blocoLivre;
+            aux->info.qtdBlocosContiguos = aux->info.qtdBlocosContiguos + n_blocosContiguosLivres; 
+            break;
+        }
+        
+        aux = aux->prox;
+    }
+    if(aux == NULL){
+        
+    }
+}
+
+
+void FirstFit(int *resp, l_areaLivre **listaAreaLivre, int *n_inicioAlocado, int mem){
+    // Utilizar lista de áreas livres
+    //Verifica se lista está vazia
+        //Se sim
+            //Informa
+            // resp = 1;
+        // Se não
+            // enquanto não encontra área livre de mesma quantia ou maor para alocar memória
+                // Se encontrar
+                    // Verificar se é a quantidade exata
+                        // Se for 
+                            //remove nó
+                        // Se não for
+                            // "particiona" o nó 
+                                // A primeira parte é alocada e a segunda é a que sobre
+                    // atualiza qual é o endereço inicial da área alocada para o novo ponteiro 
+                //se deu para alocar
+                (*resp) = 0;
+                // sai
+
+
+}
+
+void BestFit(int *resp, l_areaLivre **listaAreaLivre, int *n_inicioAlocado, int mem){
+    // Utilizar lista de áreas livres
+    t_areaLivre* aux = (*listaAreaLivre);
+    t_areaLivre* p_menorSobra = NULL;
+    int menorSobra = 0;
+
+    // Verifica se lista está vazia
+        // Se sim
+            // Informa
+             // resp = 1;
+        
+        // Se não        
+            //  enquanto não chegar ao final da lista
+                // Verificar se área livre analizada no momento tem exatamente o mesmo tamanho da quantidade de áreaque se deseja alocar
+                    // Se sim
+                        // Atualiza índice inicial da área alocada
+                        // Remove nó
+                        // sai
+
+                //Verificar se ao preencher a atual área livre a quantidade restante de blocos contíguos livres analizados é a menor de todas
+                    //Se sim 
+                        // atualiza menorSobra  
+                        // atualiza p_menorSobra    
+
+            // Se p_menorSobra for nulo significa que não encontrou espaço
+                // Sem espaço para essa quantidade de área
+                // resp = 1;
+            
+            // Caso contrário
+             // "particiona" o nó 
+                    // A primeira parte é alocada e a segunda é a que sobre
+                    // atualiza qual é o endereço inicial da área alocada para o novo ponteiro 
+                //se deu para alocar
+                (*resp) = 0;
+
+}
+
 
 void Declarar(int* heap, l_variavel **listaVar, l_areaLivre **listaAreaLivre, t_instrucao* instrucao){
 
@@ -384,7 +496,8 @@ void Declarar(int* heap, l_variavel **listaVar, l_areaLivre **listaAreaLivre, t_
     n_inicioAlocado = mem * 5; // remover isso
 
     // Verificar marcado de implementação do heap do momento
-/*     if(MARCADOR_HEAP == First_Fit)
+/*     
+    if(MARCADOR_HEAP == First_Fit)
         
         FirstFit(&resp, listaAreaLivre, &n_inicioAlocado, mem);
     else if(MARCADOR_HEAP == Best_Fit)
@@ -419,6 +532,7 @@ void VerificarOutrasVariaveis(l_variavel** lista, int inicioBlocoLivre){
     }
 }
 
+
 void Deletar(int *heap, l_variavel** listaVar, l_areaLivre** listaArea, char *variavel){
 /*     printf("\nDeletar\n");
  */
@@ -452,7 +566,7 @@ void Deletar(int *heap, l_variavel** listaVar, l_areaLivre** listaArea, char *va
         VerificarOutrasVariaveis(listaVar, n_blocoLivre);
 
         // Atualiza a lista de áreas livres
-        //AtualizarListaDeAreasLivres(listaArea, n_blocoLivre, n_blocosContiguosLivres);
+        LiberarListaDeAreasLivres(listaArea, n_blocoLivre, n_blocosContiguosLivres);
 
         // Atualiza heap nos campos que não estão sendo referenciados para 0
         AtualizarHeap(heap, n_blocoLivre, n_blocosContiguosLivres, livre);
