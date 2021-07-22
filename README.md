@@ -1,7 +1,8 @@
 # Programas feitos em C
+Repositório de programas em C criados durante a faculdade ou cursos subsequentes.
 
+> Diretórios
 
---> PASTAS
 
 1 - Mercado - Simulação de compra
   
