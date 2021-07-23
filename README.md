@@ -11,5 +11,7 @@ Repositório de programas em C criados durante a faculdade ou cursos subsequente
 ### 2 - Banco - Simulação de banco
 
 ### 3 - Agenda Telefônica
-
+  Agenda telefonica usando struct e funções.
+  
 ### 4 - Lista encadeada
+  Operações com listas encadeadas.
