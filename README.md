@@ -13,5 +13,5 @@ Repositório de programas em C criados durante a faculdade ou cursos subsequente
 ### 3 - Agenda Telefônica
   Agenda telefonica usando struct e funções.
   
-### 4 - ListaEncadeada
+### 4 - Lista Encadeada
   Operações com listas encadeadas.
