@@ -1,8 +1,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-
-
+#include <time.h>
+#include <windows.h>
 const char* operations[3] = {"SUM","SUBTRACTION","MULTIPLICATION"};
 const char  signals[3] = {'+','-','*'};
 int scores = 0;
@@ -29,8 +29,8 @@ void SHOW_SCORES(){
     printf("\n\n\t\t________________________________________________________\n\n");
 }
 
-///Function that show users the messeges asking if they whant to quit the game or continues
-///It's just the mensseges for not  over word  the function MENU
+///Function that show users the messeges asking if they want to quit the game or continues
+///It's just the messeges for not  over word  the function MENU
 void ASK_NEWGAME(){
         printf("\n\nWant a new game?\n1 - YES\t0 - NO\n\n");
         scanf("%d",&resp);
@@ -49,14 +49,14 @@ void CHECK_ANS(int result){
         printf("\n\nRIGHT ANSWER!!");
         printf("\n\n+ 10");
         printf("\n\nKeep going :)");
-        sleep(1);
+        Sleep(1);
     }
     else{
         printf("\n\nWRONG ANSWER!!");
         printf("\n\n+ 0");
         printf("\n\nDON'T GIVE UP :)");
     }
-    sleep(1);
+    Sleep(1);
 
     system("cls");
     SHOW_SCORES();
@@ -67,9 +67,9 @@ void CHOOSE_OPERATION(int v1,int v2){
     printf("\n\nYour operation is...\n\n");
     srand(time(NULL));
     op = rand() % 2;
-    sleep(1); 
+    Sleep(1); 
     printf("\n\n%s!!!!\n\n",operations[op]);
-    sleep(1); 
+    Sleep(1); 
     system("cls");
     switch (op)
     {
@@ -99,11 +99,11 @@ void CHOOSE_OPERATION(int v1,int v2){
     printf("\n\nThe result of %d %c %d is",v1,signals[op],v2);
     for (int i = 0; i < 5; i++){
         printf(".");
-        sleep(1);
+        Sleep(1);
     }
     printf("\n%d",result);
 
-    sleep(3);
+    Sleep(3);
 }
 
 ///Function for game on easy mode
@@ -151,7 +151,7 @@ void MENU(void){
     while(resp!=0){
         CHOOSE_LEVEL(&player1.level);
         GOODLUCK();
-        sleep(1);
+        Sleep(1);
         SHOW_SCORES();
         system("cls");
 
